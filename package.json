@@ -1,0 +1,126 @@
+{
+    "name": "vscode-gpteval",
+    "displayName": "Eval GPT commands in VSCode",
+    "description": "Eval GPT commands in VSCode",
+    "version": "1.0.0",
+    "publisher": "Cole Krumbholz",
+    "repository": "...",
+    "license": "GPL-3.0",
+    "engines": {
+        "vscode": "^1.30.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:gpteval.eval",
+        "onLanguage:haskell"
+    ],
+    "main": "./out/src/main",
+    "contributes": {
+        "commands": [
+            {
+                "command": "gpteval.eval",
+                "title": "GPT Eval"
+            },
+            {
+                "command": "gpteval.kill",
+                "title": "GPT Kill Eval"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "gpteval.eval",
+                "key": "Cmd+Enter"
+            },
+            {
+                "command": "gpteval.kill",
+                "key": "Cmd+Escape"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "GPT Eval Configuration",
+            "properties": {
+                "gpteval.openAIModel": {
+                    "type": "string",
+                    "default": "gpt-4-turbo",
+                    "description": "The OpenAI model you wish to use."
+                },
+                "gpteval.openAIOrg": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The OpenAI org you wish to use."
+                },
+                "gpteval.openAIKey": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The OpenAI key you wish to use."
+                },
+                "gpteval.promptPath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "The path to the prompt.txt file."
+                },
+                "gpteval.usePromptInCurrentDirectory": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "If a prompt.txt file exists in the current directory, use it."
+                },
+                "gpteval.expressionRegex": {
+                    "type": "string",
+                    "default": "(?:^--/s?([/S/s]*)$)+",
+                    "description": "Regex pattern that extracts a GPT expression."
+                },
+                "gpteval.feedbackColor": {
+                    "type": "string",
+                    "default": "rgba(100,250,100,0.3)",
+                    "description": "The highlight color to use when evaluating a GPT command."
+                },
+                "gpteval.showEvalCount": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show an incremented count of evaluations in the console output on each eval."
+                },
+                "gpteval.evalCountPrefix": {
+                    "type": "string",
+                    "default": "Evals: ",
+                    "description": "The text to write just before the eval count number."
+                }
+            }
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "gpteval",
+                    "title": "GPT Eval"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "yarn compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "package": "mkdirp dist && vsce package -o dist/gpteval.vsix --yarn",
+        "deploy:local": "yarn package && code --install-extension dist/gpteval.vsix --force",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.1.6",
+        "@types/mocha": "^5.2.5",
+        "@types/node": "^7.0.0",
+        "chai": "^4.1.2",
+        "mocha": "^5.2.0",
+        "tslint": "^5.19.0",
+        "typemoq": "^2.1.0",
+        "typescript": "4.5",
+        "vsce": "^2.15.0",
+        "vscode": "^1.1.30"
+    },
+    "dependencies": {
+        "command-exists-promise": "^2.0.2",
+        "openai": "^4.24.7"
+    }
+}
