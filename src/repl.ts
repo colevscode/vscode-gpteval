@@ -4,6 +4,7 @@ import { IHistory } from './history';
 import { DecorationRenderOptions, TextEditorDecorationType } from 'vscode';
 import { Config } from './config';
 import { IGPT } from './gpt';
+import { ILogger } from './logging';
 // import { resolve } from 'url';
 
 /**
@@ -20,6 +21,7 @@ export class Repl implements IRepl {
     public readonly postChannel: vscode.OutputChannel | null = null;
 
     constructor(
+        private logger: ILogger,
         private gpt: IGPT,
         private textEditor: vscode.TextEditor,
         private history: IHistory,
@@ -41,6 +43,7 @@ export class Repl implements IRepl {
         echoCommandToLogger: boolean = false
     ) {
         const block = new GPTEvalEditor(
+            this.logger,
             this.textEditor,
             this.config.expressionRegex()
         ).getGPTExpressionUnderCursor(isMultiline);
@@ -57,11 +60,13 @@ export class Repl implements IRepl {
             this.feedback(block.range);
             const result = await this.gpt.sendGPTExpression(
                 block.expression,
+                block.result,
                 echoCommandToLogger
             );
             if (result) {
                 const resultMsg = result.choices[0].message.content || '';
                 new GPTEvalEditor(
+                    this.logger,
                     this.textEditor,
                     this.config.expressionRegex()
                 ).insertOrReplaceResult(block, resultMsg);

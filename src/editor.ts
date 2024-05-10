@@ -1,4 +1,5 @@
 import { Range, TextEditor, TextDocument, Selection, Position } from 'vscode';
+import { ILogger } from './logging';
 
 /**
  * Represents a single expression to be executed by GPTEval.
@@ -19,7 +20,11 @@ export class GPTEvalExpression {
  * Represents a document of GPT commands.
  */
 export class GPTEvalEditor {
-    constructor(private editor: TextEditor, private expRegex: string) {}
+    constructor(
+        private logger: ILogger,
+        private editor: TextEditor,
+        private expRegex: string
+    ) {}
 
     private isEmpty(document: TextDocument, line: number): boolean {
         return document.lineAt(line).text.trim().length === 0;
@@ -140,18 +145,30 @@ export class GPTEvalEditor {
         let text = document.getText(range);
 
         // extract expression
-        const re = new RegExp(this.expRegex, 'm');
-        const match = re.exec(text);
+        const re = new RegExp(this.expRegex, 'ms');
+        let rest = text;
+        let exp = '';
+        this.logger.log('re: ' + re);
 
-        if (!match) {
+        while (rest) {
+            this.logger.log('rest: ' + rest);
+            const match = re.exec(rest);
+            this.logger.log('match: ' + match);
+            if (!match) {
+                break;
+            }
+            exp += match[1] + '\n';
+            rest = rest.slice(match.index + match[0].length);
+        }
+
+        this.logger.log('exp: ' + exp);
+        // this.logger.log('rest: ' + rest);
+
+        if (exp === '') {
             return null;
         }
 
-        return new GPTEvalExpression(
-            range,
-            match[1],
-            text.slice(match.index + match[0].length).trim()
-        );
+        return new GPTEvalExpression(range, exp.trim(), rest.trim());
     }
 
     public insertOrReplaceResult(block: GPTEvalExpression, newResult: string) {

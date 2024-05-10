@@ -31,6 +31,7 @@ export function activate(context: ExtensionContext) {
             repls.set(
                 textEditor,
                 new Repl(
+                    logger,
                     gpt,
                     textEditor,
                     history,

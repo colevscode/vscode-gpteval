@@ -69,7 +69,7 @@
                 },
                 "gpteval.expressionRegex": {
                     "type": "string",
-                    "default": "(?:^--/s?([/S/s]*)$)+",
+                    "default": "--\\s*(.*)",
                     "description": "Regex pattern that extracts a GPT expression."
                 },
                 "gpteval.feedbackColor": {
